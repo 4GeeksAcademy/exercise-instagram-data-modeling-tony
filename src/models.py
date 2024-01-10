@@ -7,26 +7,78 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class Usuario(Base):
+    __tablename__ = 'usuario'
+    id = Column(Integer, unique=True, primary_key=True)
+    name = Column(String(250), unique=False, nullable=False)
+    last_name = Column(String(250), unique=False, nullable=False)
+    email = Column(String(250), unique=True, nullable=False)
+    password = Column(String(250), unique=False, nullable=False)
+    subscription_date = Column(String(250), unique=False, nullable=False)
+    guardado = relationship("guardado")
+    post = relationship("post")
+    estado = relationship("estado")
 
     def to_dict(self):
-        return {}
+        return {
+            "id" : self.id,
+            "name" : self.name,
+            "last_name" : self.last_name,
+            "email" : self.email,
+            "password" : self.password,
+            "subscription_date" : self.subscription_date
+        }
+
+class Post(Base):
+    __tablename__ = 'post'
+    id = Column(Integer, unique=True, primary_key=True)
+    id_usuario = Column(Integer, ForeignKey("usuario.id"))
+    post_type = Column(String(250), unique=False, nullable=False)
+    posted_date = Column(String(250), unique=False, nullable=False)
+    likes = Column(Integer, unique=False, nullable=False)
+    shares = Column(Integer, unique=False, nullable=False)
+    comments = Column(Integer, unique=False, nullable=False)
+    guardado = relationship("guardado")
+
+    def to_dict(self):
+        return {
+            "id" : self.id,
+            "user_name" : self.user_name,
+            "post_type" : self.post_type,
+            "posted_date" : self.posted_date,
+            "likes" : self.likes,
+            "shares" : self.shares,
+            "comments" : self.comments
+        }
+
+class Estado(Base):
+    __tablename__ = 'estado'
+    id = Column(Integer, unique=True, primary_key=True)
+    id_usuario = Column(Integer, ForeignKey("usuario.id"))
+    posted_date = Column(String(250), unique=False, nullable=False)
+    views = Column(Integer, unique=False, nullable=False)
+    likes = Column(Integer, unique=False, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id" : self.id,
+            "user_name" : self.user_name,  
+            "posted_date" : self.posted_date,
+            "views" : self.views,
+            "likes" : self.likes      
+        }
+
+class Guardado(Base):
+    __tablename__ = 'guardado'
+    id = Column(Integer, unique=True, primary_key=True)
+    id_usuario = Column(Integer, ForeignKey("usuario.id"))
+    id_post = Column(Integer, ForeignKey("post.id"))
+
+    def to_dict(self):
+        return {
+            "id_post" : self.id_post,
+            "id_estado" : self.id_estado 
+        }
 
 ## Draw from SQLAlchemy base
 try:
